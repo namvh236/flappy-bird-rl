@@ -228,12 +228,11 @@ __marimo__/
 models/
 runs/
 
-# Experiment/demo media (Phase P6 record.py output) — bản curated trong
-# docs/media/ được commit để README nhúng GIF demo.
+# Recorded output stays local; the curated demo in media/ is committed for the README.
 *.gif
 *.mp4
 *.avi
-!docs/media/*.gif
+!media/*.gif
 
 # NEAT checkpoints (Phase P5, if implemented)
 neat-checkpoint-*
