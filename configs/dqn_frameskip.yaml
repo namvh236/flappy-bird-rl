@@ -1,5 +1,5 @@
-# Ablation P4: biased exploration + frame_skip=2 (spec §9) — mỗi hành động
-# lặp lại 2 frame lõi để giảm số quyết định ngẫu nhiên trong pha exploration.
+# Ablation: biased exploration + frame_skip=2 — each action repeats for 2
+# core frames to reduce random decisions during exploration.
 total_timesteps: 300000
 eval_freq: 10000
 n_envs: 1

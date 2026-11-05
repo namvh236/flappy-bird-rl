@@ -1,6 +1,6 @@
-# Ablation P4: biased exploration (spec §5.6, §9) — random action trong pha
-# epsilon-greedy chỉ flap với xác suất `flap_bias` thay vì 50/50 mặc định của
-# SB3 (Discrete(2)), tránh đâm trần ngay lập tức trong lúc khám phá.
+# Ablation: biased exploration — epsilon-greedy random action flaps with
+# probability flap_bias instead of SB3's 50/50 default, avoiding instant
+# ceiling collisions while exploring.
 total_timesteps: 300000
 eval_freq: 10000
 n_envs: 1

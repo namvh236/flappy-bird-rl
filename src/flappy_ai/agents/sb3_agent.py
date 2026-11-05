@@ -1,6 +1,5 @@
-"""`SB3Agent`: load model DQN/PPO đã train, cung cấp `explain()` cho HUD
-(Q-values hoặc xác suất flap) (spec §5.6).
-"""
+"""`SB3Agent`: loads a trained DQN/PPO model and exposes `explain()` for the
+HUD (Q-values or flap probability)."""
 
 from __future__ import annotations
 
@@ -16,7 +15,7 @@ _LOADERS = {"dqn": DQN, "ppo": PPO}
 class SB3Agent:
     def __init__(self, algo: str, model_path: str | Path):
         if algo not in _LOADERS:
-            raise ValueError(f"algo không hỗ trợ: {algo!r}")
+            raise ValueError(f"unsupported algo: {algo!r}")
         self.algo = algo
         self.model = _LOADERS[algo].load(model_path)
         self._last_explain: dict = {}

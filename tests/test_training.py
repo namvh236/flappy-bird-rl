@@ -1,9 +1,7 @@
-"""Test cho pipeline huấn luyện SB3 và `SB3Agent` (docs/plan/checklist.md P4).
-
-Chỉ chạy số bước rất nhỏ (không train thật) — mục tiêu là xác nhận pipeline
-(config → env → model → save/load → predict) không lỗi, không phải đo hiệu
-năng agent (việc đó thuộc benchmark G4, chạy riêng bằng `flappy-ai train`).
-"""
+"""Smoke test for the SB3 training pipeline and `SB3Agent` (checklist P4);
+runs very few steps (no real training) to confirm config -> env -> model ->
+save/load -> predict works. Performance is measured separately via
+`flappy-ai train` benchmarks."""
 
 from __future__ import annotations
 
@@ -74,7 +72,7 @@ def test_resume_continues_timesteps_and_replay_buffer(tmp_path, dqn_config, monk
     model = SB3Agent("dqn", resumed_dir / "final_model.zip").model
     assert model.num_timesteps == 300
     with (resumed_dir / "checkpoint_replay_buffer.pkl").open("rb") as f:
-        # Run resume tự nó chỉ thêm ≤100 transition; nhiều hơn ⇒ buffer cũ đã được nạp.
+        # Resume itself only adds <=100 transitions; more means the old buffer loaded.
         assert pickle.load(f).pos > 100
 
 

@@ -1,8 +1,5 @@
-"""AABB rect nhẹ, không phụ thuộc `pygame`, để game core chạy headless thuần
-Python (nguyên tắc §3.1: core không gọi `pygame.display`).
-
-Ngữ nghĩa khớp `pygame.Rect`: `right = x + width`, `bottom = y + height`,
-`colliderect` không tính hai cạnh chỉ chạm nhau là va chạm.
+"""Lightweight AABB rect with no `pygame` dependency, for the headless game core;
+semantics match `pygame.Rect`.
 """
 
 from __future__ import annotations

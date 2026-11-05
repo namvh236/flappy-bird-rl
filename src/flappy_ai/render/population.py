@@ -1,8 +1,8 @@
-"""Xem cả quần thể NEAT bay cùng lúc (docs/plan/plan.md:131, checklist.md:85).
+"""Viewer for a whole NEAT population flying at once.
 
-Mọi game dùng cùng seed nên bố cục pipe giống hệt nhau giữa các cá thể — chỉ
-cần vẽ bg/pipe/ground một lần (theo game đầu tiên) rồi chồng bird của từng
-game lên, tint màu khác nhau để phân biệt.
+Every game uses the same seed, so pipe layout is identical across
+individuals — bg/pipes/ground are drawn once (from the first game), then each
+bird is overlaid with a distinct tint.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ _DEAD_TINT = (120, 120, 120, 110)
 
 
 class PopulationRenderer(PygameRenderer):
-    """Vẽ nhiều `GameState` (cùng seed) chồng lên một nền pipe/ground duy nhất."""
+    """Overlays multiple same-seed `GameState`s on one shared pipe/ground background."""
 
     def __init__(self, config: GameConfig, render_mode: str | None = "human"):
         super().__init__(config, render_mode)
@@ -80,10 +80,9 @@ def _latest_neat_model_dir() -> Path:
     )
     if not candidates:
         raise RuntimeError(
-            "Không tìm thấy model NEAT nào trong models/neat_*/ — chạy "
-            "`flappy-ai train --algo neat` trước, hoặc truyền genome_path/config_path."
+            "No NEAT model found in models/neat_*/ — run "
+            "`flappy-ai train --algo neat` first, or pass genome_path/config_path."
         )
-    return candidates[-1]
 
 
 def run_population_view(
@@ -94,17 +93,17 @@ def run_population_view(
     fps: int = 60,
     max_frames: int | None = 3600,
 ) -> None:
-    """Thả `n` bản cùng genome NEAT (từ P5) bay song song trên cùng một seed.
+    """Runs `n` copies of the same NEAT genome in parallel on one seed.
 
-    `config_path`/`genome_path` mặc định lấy từ model NEAT mới nhất trong
-    `models/neat_*/` (file `config.cfg` + `best_genome.pkl`, xem `train_neat.py`).
+    `config_path`/`genome_path` default to the latest model in
+    `models/neat_*/` (`config.cfg` + `best_genome.pkl`, see `train_neat.py`).
     """
     try:
         from ..agents.neat_agent import NeatAgent
     except ImportError as exc:
         raise RuntimeError(
-            "Chưa có flappy_ai.agents.neat_agent.NeatAgent — chạy train_neat.py "
-            "(P5) để train và lưu genome trước khi xem population."
+            "flappy_ai.agents.neat_agent.NeatAgent not found — run train_neat.py "
+            "to train and save a genome before viewing the population."
         ) from exc
 
     if config_path is None or genome_path is None:

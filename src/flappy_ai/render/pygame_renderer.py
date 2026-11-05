@@ -1,7 +1,6 @@
-"""Vẽ `GameState` lên màn hình (spec §5.3). Không chứa logic game — chỉ đọc
-state và blit asset. Asset nạp một lần duy nhất ở `__init__` (khác bản gốc,
-vốn nạp lại ảnh pipe cho mỗi instance — điểm kém hiệu quả đã biết, không copy
-theo, xem AGENTS.md).
+"""Draws `GameState` to the screen; no game logic, just reads state and blits
+assets. Assets load once in `__init__`, unlike legacy which reloads them per
+instance (a known inefficiency, not copied here).
 """
 
 from __future__ import annotations
@@ -18,8 +17,8 @@ WHITE = (255, 255, 255)
 
 
 class PygameRenderer:
-    """`render_mode`: "human" (cửa sổ + tick fps) hoặc "rgb_array"/None (vẽ lên
-    `Surface` ngoài màn hình, không tick fps — dùng cho ghi hình hoặc pixel obs).
+    """`render_mode`: "human" shows a window and ticks fps; "rgb_array"/None draws
+    off-screen without ticking, for recording or pixel obs.
     """
 
     def __init__(self, config: GameConfig, render_mode: str | None = "human", overlay=None):
@@ -32,10 +31,8 @@ class PygameRenderer:
         if not pygame.get_init():
             pygame.init()
 
-        # Cả hai chế độ đều đi qua display.set_mode: .convert()/.convert_alpha()
-        # cần một display mode đã khởi tạo. "Headless" đạt được bằng cách đặt
-        # biến môi trường SDL_VIDEODRIVER=dummy TRƯỚC khi renderer khởi tạo
-        # (xem architecture.md:260), không phải bằng cách né display.set_mode.
+        # Both modes need display.set_mode for .convert(); "headless" means setting
+        # SDL_VIDEODRIVER=dummy before renderer init, not skipping display.set_mode.
         self.screen = pygame.display.set_mode((config.screen_width, config.screen_height))
         if render_mode == "human":
             pygame.display.set_caption("Flappy Bird")
@@ -51,8 +48,7 @@ class PygameRenderer:
             pygame.image.load(str(ASSETS / f"bird{n}.png")).convert_alpha() for n in (1, 2, 3)
         ]
 
-        # P10 fix: 'Bauhaus 93' không có trên Linux; SysFont tự fallback nhưng
-        # in cảnh báo — dùng font mặc định pygame thẳng nếu không tìm thấy.
+        # 'Bauhaus 93' isn't on Linux; checking first avoids SysFont's fallback warning.
         if pygame.font.match_font("Bauhaus 93"):
             self.font = pygame.font.SysFont("Bauhaus 93", 60)
         else:

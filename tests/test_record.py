@@ -1,4 +1,4 @@
-"""Test cho `record.py` (docs/plan/checklist.md P6)."""
+"""Tests for `record.py` (checklist P6)."""
 
 from __future__ import annotations
 

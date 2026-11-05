@@ -1,4 +1,4 @@
-"""Test cho `PixelObs` wrapper (configs/dqn_pixels.yaml)."""
+"""Tests for `PixelObs` wrapper (configs/dqn_pixels.yaml)."""
 
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
-"""Đo throughput headless của `FlappyBirdEnv` (G1: >= 5.000 step/s, plan P1.7).
+"""Measures headless `FlappyBirdEnv` throughput (G1: >= 5,000 step/s).
 
-Chạy: `.venv/bin/python scripts/benchmark_headless.py [--steps 20000]`
+Run: `.venv/bin/python scripts/benchmark_headless.py [--steps 20000]`
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
     rate = benchmark(args.steps, args.seed)
-    print(f"{rate:,.0f} step/s ({args.steps} step, hành động ngẫu nhiên, headless)")
+    print(f"{rate:,.0f} step/s ({args.steps} steps, random actions, headless)")
     print("G1 (>= 5.000 step/s):", "PASS" if rate >= 5_000 else "FAIL")
 
 

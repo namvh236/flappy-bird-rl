@@ -1,7 +1,7 @@
-"""`train_sb3.py`: huấn luyện DQN/PPO trên `FlappyBird-v0` qua
-`stable-baselines3` (spec §5.7). Mỗi lần chạy tạo `runs/<algo>_<timestamp>/`
-chứa `config.yaml` + `git_commit.txt` + log TensorBoard;
-`models/<algo>_<timestamp>/best_model.zip` được `EvalCallback` lưu định kỳ.
+"""`train_sb3.py`: trains DQN/PPO on `FlappyBird-v0` via `stable-baselines3`.
+Each run creates `runs/<algo>_<timestamp>/` with `config.yaml` +
+`git_commit.txt` + TensorBoard logs; `EvalCallback` periodically saves
+`models/<algo>_<timestamp>/best_model.zip`.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ import yaml
 from stable_baselines3 import DQN, PPO
 from stable_baselines3.common.env_util import make_vec_env
 
-import flappy_ai.env  # noqa: F401 (đăng ký "FlappyBird-v0")
+import flappy_ai.env  # noqa: F401 (registers "FlappyBird-v0")
 
 from ..env.wrappers import FrameSkip, PixelObs
 from ..game.config import GameConfig
@@ -34,15 +34,9 @@ DEFAULT_CONFIGS = {"dqn": Path("configs/dqn.yaml"), "ppo": Path("configs/ppo.yam
 
 
 class BiasedExplorationDQN(DQN):
-    """DQN với exploration ngẫu nhiên lệch về phía flap (spec §5.6, §9): với
-    action space nhị phân {không làm gì, flap}, epsilon-greedy đều 50/50 mặc
-    định của SB3 khiến bird đâm trần gần như ngay lập tức trong toàn bộ pha
-    warmup/exploration — không bao giờ sống đủ lâu để thấy pipe (đã quan sát
-    thực nghiệm: DQN mặc định plateau ở mean score ~0 sau 1M step, xem
-    `docs/plan/experiments.md`). Ghi đè phần lấy hành động ngẫu nhiên trong
-    `DQN.predict()` (nguồn duy nhất sinh random action sau warmup) để chỉ
-    flap với xác suất `flap_bias` thay vì 50%.
-    """
+    """DQN whose random exploration is biased toward flapping; SB3's default
+    50/50 epsilon-greedy makes the bird hit the ceiling almost immediately
+    during warmup, so it never lives long enough to see a pipe."""
 
     def __init__(self, *args, flap_bias: float = 0.1, **kwargs):
         self.flap_bias = flap_bias
@@ -117,8 +111,8 @@ def train(
         wrapper_class = FrameSkip
         wrapper_kwargs = {"skip": frame_skip}
 
-    # Pixel obs bị nghẽn ở khâu render (DummyVecEnv chạy tuần tự ~56 step/s);
-    # SubprocVecEnv đẩy phần render sang nhiều process.
+    # Pixel obs is render-bound (DummyVecEnv runs serially ~56 step/s);
+    # SubprocVecEnv spreads rendering across processes.
     vec_env_cls = None
     vec_env_kwargs = None
     if config.get("vec_env") == "subproc" and envs > 1:
@@ -160,8 +154,8 @@ def train(
     if algo_cls is BiasedExplorationDQN:
         model_kwargs["flap_bias"] = flap_bias
     if resume:
-        # kwargs ghi đè hyperparams đã lưu trước `_setup_model()`, nên thay đổi config
-        # (vd. `optimize_memory_usage`) áp dụng được lên model cũ.
+        # kwargs override saved hyperparams before `_setup_model()`, so config
+        # changes (e.g. `optimize_memory_usage`) apply to the resumed model.
         model = algo_cls.load(
             resume, env=env, device=device, tensorboard_log=str(run_dir), **model_kwargs
         )
@@ -170,8 +164,8 @@ def train(
             if buffer_path.exists():
                 model.load_replay_buffer(buffer_path)
             else:
-                # Buffer rỗng: thu thập lại `learning_starts` step trước khi train,
-                # không thì gradient đầu tiên chỉ lấy mẫu từ vài transition.
+                # Empty buffer: collect `learning_starts` steps again before
+                # training, or the first gradient only sees a few transitions.
                 model.learning_starts += model.num_timesteps
     else:
         model = algo_cls(
@@ -210,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--total-timesteps", type=int, default=None)
     parser.add_argument("--n-envs", type=int, default=None)
     parser.add_argument("--device", default="auto")
-    parser.add_argument("--resume", type=Path, default=None, help="model .zip để train tiếp")
+    parser.add_argument("--resume", type=Path, default=None, help="model .zip to resume")
     args = parser.parse_args(argv)
 
     config_path = args.config or DEFAULT_CONFIGS[args.algo]

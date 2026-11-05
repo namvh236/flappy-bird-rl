@@ -1,7 +1,6 @@
-"""Callback dùng chung cho huấn luyện SB3 (spec §5.7): eval định kỳ + lưu
-best model, log `score`/`pipes_passed` lên TensorBoard (SB3 mặc định chỉ log
-reward/episode length, không biết về các field tuỳ ý trong `info`), checkpoint
-để resume sau crash.
+"""Shared SB3 training callbacks: periodic eval + best-model save, logging
+`score`/`pipes_passed` to TensorBoard (SB3 only logs reward/episode length by
+default), and checkpointing to resume after a crash.
 """
 
 from __future__ import annotations
@@ -33,12 +32,9 @@ class ScoreLoggingCallback(BaseCallback):
 
 
 class LatestCheckpointCallback(BaseCallback):
-    """Mỗi `save_freq` env step ghi đè `checkpoint.zip` (+ replay buffer nếu có).
-
-    Không dùng `CheckpointCallback` của SB3 vì nó giữ mọi bản: với DQN pixel mỗi
-    replay buffer ~2,6 GB. Ghi file tạm rồi `os.replace` để crash giữa lúc ghi
-    không làm hỏng checkpoint trước.
-    """
+    """Overwrites `checkpoint.zip` every `save_freq` steps instead of SB3's
+    `CheckpointCallback`, which keeps every checkpoint (~2.6 GB per replay
+    buffer for pixel DQN); writes to a temp file then `os.replace`s it."""
 
     def __init__(self, model_dir: Path, save_freq: int, verbose: int = 0):
         super().__init__(verbose)

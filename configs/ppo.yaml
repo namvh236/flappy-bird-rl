@@ -1,4 +1,4 @@
-# Hyperparameter khởi điểm PPO (spec §5.6), `n_envs = 8` để so sánh với DQN.
+# Starting PPO hyperparameters; n_envs = 8 for comparison against DQN.
 total_timesteps: 300000
 eval_freq: 10000
 n_envs: 8

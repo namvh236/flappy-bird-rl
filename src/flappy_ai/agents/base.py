@@ -1,4 +1,4 @@
-"""Interface chung cho mọi agent (spec §5.6)."""
+"""Common interface implemented by every agent."""
 
 from __future__ import annotations
 

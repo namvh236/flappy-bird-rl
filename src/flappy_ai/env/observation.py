@@ -1,9 +1,5 @@
-"""Vector đặc trưng 8 chiều cho `FlappyBirdEnv` (spec §5.4).
-
-"Pipe kế tiếp" = pipe đầu tiên chưa đi qua hết bird (`right >= bird.left`).
-Khi chưa đủ pipe thật (0 hoặc 1 cặp đang trên màn hình), dùng pipe ảo ở
-`x = screen_width`, khe ở giữa màn hình, để vector luôn đủ 8 chiều mà không
-cần nhánh đặc biệt ở env.
+"""8-dim feature vector for `FlappyBirdEnv`; uses virtual pipes when fewer than
+2 real ones are on screen, avoiding special-case branches in the env.
 """
 
 from __future__ import annotations
@@ -27,11 +23,12 @@ def _virtual_pipe(config: GameConfig, x: float) -> PipePairState:
 
 
 def next_pipes(state: GameState, config: GameConfig) -> tuple[PipePairState, PipePairState]:
-    """Trả về (pipe1, pipe2) — hai pipe kế tiếp bird, dùng pipe ảo nếu thiếu."""
+    """Next two pipes ahead of the bird, falling back to virtual pipes if needed."""
     bird_left = state.bird_rect.left
     upcoming = [p for p in state.pipes if p.x + config.pipe_width >= bird_left]
     pipe1 = upcoming[0] if upcoming else _virtual_pipe(config, config.screen_width)
-    pipe2 = upcoming[1] if len(upcoming) > 1 else _virtual_pipe(config, pipe1.x + config.screen_width / 2)
+    pipe2_x = pipe1.x + config.screen_width / 2
+    pipe2 = upcoming[1] if len(upcoming) > 1 else _virtual_pipe(config, pipe2_x)
     return pipe1, pipe2
 
 

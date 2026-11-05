@@ -1,8 +1,5 @@
-"""Đăng ký `FlappyBird-v0` với Gymnasium khi import `flappy_ai.env` (spec §5.4).
-
-`max_episode_steps=None` ở `gym.register`: `FlappyBirdEnv` tự quản lý
-`truncated` qua tham số `max_episode_steps` riêng, không cần `TimeLimit`
-wrapper của Gymnasium chồng lên (sẽ tạo ra 2 nguồn truncation khác nhau).
+"""Registers `FlappyBird-v0` with Gymnasium; `max_episode_steps=None` avoids a
+second `TimeLimit` truncation source since `FlappyBirdEnv` manages its own.
 """
 
 from __future__ import annotations

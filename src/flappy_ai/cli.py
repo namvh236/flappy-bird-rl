@@ -1,8 +1,9 @@
-"""CLI entry point cho `flappy-ai` (spec §5.8).
+"""CLI entry point for `flappy-ai`.
 
-`play --agent human` chơi trực tiếp trên `FlappyGame` + `PygameRenderer`.
-`play --agent random|heuristic|dqn|ppo|neat` (kèm `--debug` cho HUD), `eval`,
-`train` (SB3 hoặc NEAT), `record` (GIF/MP4) chạy qua `FlappyBirdEnv` + `Agent`.
+`play --agent human` plays directly on `FlappyGame` + `PygameRenderer`.
+`play --agent random|heuristic|dqn|ppo|neat` (with `--debug` for the HUD),
+`eval`, `train` (SB3 or NEAT), `record` (GIF/MP4) run through
+`FlappyBirdEnv` + `Agent`.
 """
 
 from __future__ import annotations
@@ -18,19 +19,21 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="flappy-ai")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    play = sub.add_parser("play", help="Xem một agent chơi")
+    play = sub.add_parser("play", help="Watch an agent play")
     play.add_argument("--agent", choices=["human", *AGENTS], default="human")
     play.add_argument("--model", type=str, default=None)
     play.add_argument("--genome", type=str, default=None)
     play.add_argument("--neat-config", type=str, default=None)
     play.add_argument("--fps", type=int, default=60)
     play.add_argument("--seed", type=int, default=None)
-    play.add_argument("--debug", action="store_true", help="HUD: cảm biến, action, Q-values")
-    play.add_argument("--pixel-obs", action="store_true", help="model train trên ảnh")
-    play.add_argument("--population", action="store_true", help="xem cả quần thể NEAT bay cùng lúc")
-    play.add_argument("--birds", type=int, default=10, help="số bird khi --population")
+    play.add_argument("--debug", action="store_true", help="HUD: sensors, action, Q-values")
+    play.add_argument("--pixel-obs", action="store_true", help="model trained on images")
+    play.add_argument(
+        "--population", action="store_true", help="watch the whole NEAT population fly at once"
+    )
+    play.add_argument("--birds", type=int, default=10, help="number of birds for --population")
 
-    eval_cmd = sub.add_parser("eval", help="Đánh giá agent trên N episode")
+    eval_cmd = sub.add_parser("eval", help="Evaluate an agent over N episodes")
     eval_cmd.add_argument("--agent", choices=AGENTS, required=True)
     eval_cmd.add_argument("--model", type=str, default=None)
     eval_cmd.add_argument("--genome", type=str, default=None)
@@ -40,21 +43,19 @@ def main(argv: list[str] | None = None) -> int:
     eval_cmd.add_argument("--max-episode-steps", type=int, default=None)
     eval_cmd.add_argument("--pixel-obs", action="store_true")
 
-    train_cmd = sub.add_parser("train", help="Huấn luyện: SB3 (DQN/PPO) hoặc NEAT")
+    train_cmd = sub.add_parser("train", help="Train: SB3 (DQN/PPO) or NEAT")
     train_cmd.add_argument("--algo", choices=["dqn", "ppo", "neat"], required=True)
     train_cmd.add_argument("--config", type=str, default=None)
     train_cmd.add_argument("--seed", type=int, default=0)
     train_cmd.add_argument("--total-timesteps", type=int, default=None)
-    train_cmd.add_argument("--generations", type=int, default=None, help="chỉ dùng cho NEAT")
-    train_cmd.add_argument(
-        "--episodes-per-genome", type=int, default=None, help="chỉ dùng cho NEAT"
-    )
-    train_cmd.add_argument("--pop-size", type=int, default=None, help="chỉ dùng cho NEAT")
+    train_cmd.add_argument("--generations", type=int, default=None, help="NEAT only")
+    train_cmd.add_argument("--episodes-per-genome", type=int, default=None, help="NEAT only")
+    train_cmd.add_argument("--pop-size", type=int, default=None, help="NEAT only")
     train_cmd.add_argument("--n-envs", type=int, default=None)
     train_cmd.add_argument("--device", default="auto")
-    train_cmd.add_argument("--resume", type=str, default=None, help="SB3: model .zip để train tiếp")
+    train_cmd.add_argument("--resume", type=str, default=None, help="SB3: model .zip to resume")
 
-    record_cmd = sub.add_parser("record", help="Ghi GIF/MP4 một agent chơi")
+    record_cmd = sub.add_parser("record", help="Record an agent playing to GIF/MP4")
     record_cmd.add_argument("--agent", choices=AGENTS, default="heuristic")
     record_cmd.add_argument("--model", type=str, default=None)
     record_cmd.add_argument("--genome", type=str, default=None)
@@ -126,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "train":
         if args.algo == "neat":
             if args.resume:
-                parser.error("--resume chỉ hỗ trợ SB3 (dqn/ppo)")
+                parser.error("--resume only supports SB3 (dqn/ppo)")
             from flappy_ai.training.train_neat import DEFAULT_NEAT_CONFIG, train_neat
 
             config_path = Path(args.config) if args.config else DEFAULT_NEAT_CONFIG
@@ -174,7 +175,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Saved recording to {out}")
         return 0
 
-    parser.error(f"lệnh chưa triển khai: {args.command}")
+    parser.error(f"unimplemented command: {args.command}")
     return 2
 
 

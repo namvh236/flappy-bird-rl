@@ -1,5 +1,5 @@
-"""`DebugOverlay`: vẽ đường cảm biến tới pipe kế tiếp + panel debug (action,
-explain, episode, fps) lên trên `PygameRenderer.draw()` (spec §5.3).
+"""`DebugOverlay`: draws a sensor line to the next pipe plus a debug panel
+(action, explain, episode, fps) over `PygameRenderer.draw()`.
 """
 
 from __future__ import annotations

@@ -1,7 +1,5 @@
-"""`Bird` và `PipePair`: state thuần (không render, không input trực tiếp).
-
-Bản gốc di chuyển bird qua `rect.y` (mép trên), không phải tâm — `Bird.y` ở
-đây theo đúng ngữ nghĩa đó để giữ quỹ đạo vật lý y hệt (xem test_parity.py).
+"""`Bird` and `PipePair`: pure state. `Bird.y` is the top edge (not center),
+matching legacy physics exactly (see test_parity.py).
 """
 
 from __future__ import annotations
@@ -14,27 +12,25 @@ from .rect import Rect
 
 @dataclass
 class Bird:
-    y: float  # mép trên (top) của rect, khớp bản gốc: `self.rect.y += int(vel)`
+    y: float  # top edge of rect, matches legacy's `self.rect.y += int(vel)`
     vel: float = 0.0
 
     @classmethod
     def spawn(cls, config: GameConfig) -> Bird:
-        # Bản gốc: Bird(x, y) đặt `rect.center = [x, y]` với bird_start là tâm.
+        # legacy sets rect.center = bird_start; convert center to top edge here
         center_y = config.bird_start[1]
         top_y = center_y - config.bird_size[1] // 2
         return cls(y=float(top_y), vel=0.0)
 
     def rect(self, config: GameConfig) -> Rect:
-        # rect.x cố định suốt game (bản gốc không bao giờ đổi rect.x sau khi tạo).
+        # rect.x never changes after creation, matching legacy
         x = config.bird_start[0] - config.bird_size[0] // 2
         return Rect(x=x, y=self.y, width=config.bird_size[0], height=config.bird_size[1])
 
     def step_physics(self, config: GameConfig, flap: bool) -> None:
-        # Bản gốc: gravity + di chuyển chạy TRƯỚC, click-to-flap chạy SAU trong
-        # cùng một frame ⇒ `vel = flap_velocity` chỉ có hiệu lực từ frame kế
-        # tiếp. Đảo thứ tự này sẽ làm sai quỹ đạo so với bản gốc (test_parity).
+        # Gravity+move runs before flap in legacy; flap only takes effect next frame
         self.vel = min(self.vel + config.gravity, config.max_fall_speed)
-        # Bản gốc chỉ cộng dịch chuyển nếu rect.bottom < ground_y TRƯỚC khi cộng.
+        # Legacy only applies movement if rect.bottom < ground_y before adding
         if self.rect(config).bottom < config.ground_y:
             dy = self.vel if config.float_physics else float(int(self.vel))
             self.y += dy

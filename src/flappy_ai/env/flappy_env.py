@@ -1,6 +1,5 @@
-"""`FlappyBirdEnv(gymnasium.Env)`: bọc `FlappyGame` theo interface Gymnasium
-chuẩn (spec §5.4). Headless mặc định (`render_mode=None`) — không đụng
-`pygame.display` cho tới khi thật sự cần vẽ (`human`/`rgb_array`).
+"""`FlappyBirdEnv(gymnasium.Env)`: wraps `FlappyGame`; headless by default, only
+touches `pygame.display` when actually rendering (`human`/`rgb_array`).
 """
 
 from __future__ import annotations
@@ -31,9 +30,9 @@ class FlappyBirdEnv(gym.Env):
         debug_overlay: bool = False,
     ):
         if render_mode is not None and render_mode not in self.metadata["render_modes"]:
-            raise ValueError(f"render_mode không hợp lệ: {render_mode!r}")
+            raise ValueError(f"invalid render_mode: {render_mode!r}")
         if reward_mode not in REWARD_MODES:
-            raise ValueError(f"reward_mode không hợp lệ: {reward_mode!r}")
+            raise ValueError(f"invalid reward_mode: {reward_mode!r}")
 
         self.config = config
         self.render_mode = render_mode
@@ -96,8 +95,7 @@ class FlappyBirdEnv(gym.Env):
 
     @property
     def renderer(self):
-        """Renderer của env (tạo lazily ở lần vẽ đầu) — play/record cần nó để
-        chỉnh tốc độ/tạm dừng."""
+        """Lazily created renderer; exposed so play/record can control speed/pause."""
         if self._renderer is None:
             self._render_frame()
         return self._renderer

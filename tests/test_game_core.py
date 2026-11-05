@@ -1,9 +1,4 @@
-"""Unit test cho `FlappyGame` (docs/plan/checklist.md P1).
-
-Không test wiring/no-op; mỗi test khẳng định một bất biến vật lý hoặc luật
-chơi cụ thể, độc lập với heuristic điều khiển (dùng thao tác đặt state trực
-tiếp khi cần cô lập logic khỏi khả năng "lái" của một chính sách giả định).
-"""
+"""Unit tests for `FlappyGame`; each test checks one physics/rule invariant."""
 
 from __future__ import annotations
 
@@ -16,8 +11,8 @@ def test_spawn_position_matches_legacy_center_to_topleft():
     cfg = GameConfig()
     game = FlappyGame(cfg, seed=0)
     state = game.reset(seed=0)
-    # Bản gốc: Bird(100, 468) đặt rect.center=[100,468] -> topleft (75, 450)
-    # với bird_size=(51, 36).
+    # Original: Bird(100, 468) sets rect.center=[100,468] -> topleft (75, 450)
+    # with bird_size=(51, 36).
     assert state.bird_rect.x == 75
     assert state.bird_y == 450.0
     assert state.bird_vel == 0.0
@@ -30,7 +25,7 @@ def test_gravity_accumulates_and_clamps_to_max_fall_speed():
     game.reset(seed=0)
     for _ in range(3):
         game.step(False)
-    assert game.state.bird_vel == 1.5  # 0.5 * 3, chưa chạm ground trong 3 frame
+    assert game.state.bird_vel == 1.5  # 0.5 * 3, not yet touching ground within 3 frames
     for _ in range(40):
         result = game.step(False)
         if result.dead:
@@ -39,17 +34,17 @@ def test_gravity_accumulates_and_clamps_to_max_fall_speed():
 
 
 def test_flap_sets_velocity_next_frame_not_current_frame():
-    """Bản gốc: gravity+move chạy trước, click-to-flap chạy sau trong cùng
-    frame ⇒ `vel = flap_velocity` chỉ có hiệu lực từ frame kế tiếp."""
+    """Original: gravity+move runs before flap in the same frame, so flap
+    velocity only takes effect on the next frame."""
     game = FlappyGame(GameConfig(), seed=1)
     game.reset(seed=1)
     y_before = game.state.bird_y
     game.step(True)
     assert game.state.bird_vel == -10.0
-    # Frame flap: di chuyển vẫn dùng vel TRƯỚC flap (0.5 -> int 0) nên y không đổi.
+    # Flap frame: movement still uses vel BEFORE flap (0.5 -> int 0), so y is unchanged.
     assert game.state.bird_y == y_before
     game.step(False)
-    # Frame kế tiếp: gravity cộng vào -10 -> -9.5.
+    # Next frame: gravity adds to -10 -> -9.5.
     assert game.state.bird_vel == -9.5
 
 
@@ -70,8 +65,8 @@ def test_dies_on_ceiling():
     game = FlappyGame(GameConfig(), seed=3)
     game.reset(seed=3)
     result = None
-    # Flap liên tục ⇒ vel bị ghim lại -10 mỗi frame, gravity luôn cộng từ đó
-    # ra -9.5 (int -9/frame) ⇒ leo trần đều đặn 9px/frame, chạm y<0 ở frame 52.
+    # Flapping every frame pins vel to -10, gravity then adds -9.5 (int
+    # -9/frame) => climbs steadily at 9px/frame, hitting y<0 at frame 52.
     for _ in range(80):
         result = game.step(True)
         if result.dead:
@@ -85,8 +80,8 @@ def test_dies_on_pipe_collision():
     cfg = GameConfig()
     game = FlappyGame(cfg, seed=4)
     game.reset(seed=4)
-    # Đặt trực tiếp một pipe chồng lên bird (bird ở y=450..486, gap rất hẹp
-    # và lệch cao để bird chắc chắn đâm ống trên).
+    # Place a pipe directly overlapping the bird (bird at y=450..486, a
+    # narrow gap shifted high so the bird is guaranteed to hit the top pipe).
     game.pipes = [PipePair(x=75.0, gap_center=900.0)]
     result = game.step(False)
     assert result.dead
@@ -97,14 +92,14 @@ def test_scores_once_per_pipe_no_double_count():
     cfg = GameConfig()
     game = FlappyGame(cfg, seed=5)
     game.reset(seed=5)
-    # Đặt pipe ngay sát ngưỡng "đã qua hẳn bird" (pipe.right < bird.left).
+    # Place the pipe right at the "fully passed the bird" threshold (pipe.right < bird.left).
     game.pipes = [PipePair(x=75 - cfg.pipe_width - cfg.scroll_speed + 1, gap_center=468.0)]
     result = game.step(False)
     assert result.passed_pipe
     assert game.state.score == 1
     result2 = game.step(False)
     assert not result2.passed_pipe
-    assert game.state.score == 1  # không tính trùng
+    assert game.state.score == 1  # not double-counted
 
 
 def test_reset_clears_all_state_between_episodes():
@@ -152,4 +147,4 @@ def test_different_seed_can_produce_different_pipe_sequence():
         return game.pipes[0].gap_center
 
     gaps = {first_gap(s) for s in range(10)}
-    assert len(gaps) > 1  # các seed khác nhau không luôn ra cùng offset
+    assert len(gaps) > 1  # different seeds don't always produce the same offset

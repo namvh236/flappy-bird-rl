@@ -1,14 +1,14 @@
-# Stretch goal: CNN DQN trên pixel observation 84×84×4 (spec §5.7, §9).
+# Stretch goal: CNN DQN on 84x84x4 pixel observations.
 policy: CnnPolicy
 pixel_obs: true
 total_timesteps: 2000000
 eval_freq: 6250
 n_envs: 8
-# Render pixel bị nghẽn CPU: DummyVecEnv (mặc định SB3) chạy 8 env tuần tự
-# ~56 step/s; SubprocVecEnv tách render ra nhiều process (~7× nhanh hơn).
+# Pixel rendering is CPU-bound: SB3's default DummyVecEnv runs 8 envs
+# serially (~56 step/s); SubprocVecEnv parallelizes rendering (~7x faster).
 vec_env: subproc
 vec_env_start_method: forkserver
-# Env step; ghi đè models/<run>/checkpoint.zip + replay buffer để `--resume` sau crash.
+# Periodic checkpoint of models/<run>/checkpoint.zip + replay buffer for --resume after a crash.
 checkpoint_freq: 100000
 
 hyperparameters:
@@ -22,8 +22,9 @@ hyperparameters:
   exploration_fraction: 0.1
   exploration_final_eps: 0.01
   gamma: 0.99
-  # Chỉ lưu obs (next_obs = ô kế tiếp): buffer 5,26 → 2,63 GiB; run trước bị OOM-kill ở
-  # ~650k step. SB3 bắt buộc tắt handle_timeout_termination khi bật tuỳ chọn này.
+  # Stores only obs (next_obs = following slot): buffer 5.26 -> 2.63 GiB; a
+  # prior run was OOM-killed around 650k steps. SB3 requires
+  # handle_timeout_termination disabled with this option.
   optimize_memory_usage: true
   replay_buffer_kwargs:
     handle_timeout_termination: false

@@ -1,6 +1,6 @@
-"""`evaluate.py`: chạy N episode với 1 agent trên dải seed cố định, xuất
-mean/median/max/std điểm số + phân bố `death_cause`, lưu `results.json` +
-CSV để so sánh các agent (spec §5.7).
+"""`evaluate.py`: runs N episodes with one agent over a fixed seed range,
+reports mean/median/max/std score + `death_cause` distribution, and saves
+`results.json` + CSV for comparing agents.
 """
 
 from __future__ import annotations
@@ -90,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--pixel-obs",
         action="store_true",
-        help="agent được train trên ảnh: bọc env bằng PixelObs",
+        help="agent trained on images: wrap env with PixelObs",
     )
     parser.add_argument("--out", type=Path, default=Path("runs/eval"))
     args = parser.parse_args(argv)

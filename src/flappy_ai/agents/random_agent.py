@@ -1,6 +1,5 @@
-"""`RandomAgent`: flap ngẫu nhiên với xác suất `flap_prob` — sàn điểm (lower
-bound) để so sánh với các agent có học (spec §5.6).
-"""
+"""`RandomAgent`: flaps with probability `flap_prob`, a lower-bound baseline
+for learned agents."""
 
 from __future__ import annotations
 

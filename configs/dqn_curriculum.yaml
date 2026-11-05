@@ -1,5 +1,5 @@
-# Ablation P4: biased exploration + curriculum (`pipe_gap` rộng hơn bản gốc,
-# 220 thay vì 150, spec §9) để dễ sống sót qua pha đầu học.
+# Ablation: biased exploration + curriculum (pipe_gap widened to 220 from
+# 150) for easier early-training survival.
 total_timesteps: 300000
 eval_freq: 10000
 n_envs: 1

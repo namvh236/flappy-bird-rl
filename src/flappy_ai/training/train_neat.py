@@ -1,10 +1,9 @@
-"""`train_neat.py`: huấn luyện agent NEAT trực tiếp trên `FlappyGame` +
-`build_features` (không qua `FlappyBirdEnv`/Gymnasium, để fitness nhiều genome
-mỗi generation chạy nhanh, spec §5.6/§5.7). Mỗi lần chạy tạo
-`runs/neat_<timestamp>_<pid>/` (metadata: `config.cfg`, `git_commit.txt`,
-`results.json`, checkpoint `neat-checkpoint-<gen>` mỗi 10 generation) và
-`models/neat_<same>/` (`best_genome.pkl` + `config.cfg`, đủ để `NeatAgent`/CLI
-tự resolve model mới nhất mà không cần đụng tới `runs/`).
+"""`train_neat.py`: trains a NEAT agent directly on `FlappyGame` +
+`build_features` (bypassing `FlappyBirdEnv`/Gymnasium so per-generation
+fitness evaluation runs fast). Each run creates `runs/neat_<timestamp>_<pid>/`
+(`config.cfg`, `git_commit.txt`, `results.json`, a checkpoint every 10
+generations) and `models/neat_<same>/` (`best_genome.pkl` + `config.cfg`, so
+`NeatAgent`/CLI can resolve the latest model without touching `runs/`).
 """
 
 from __future__ import annotations
@@ -41,7 +40,7 @@ def _git_commit_hash() -> str:
 def _run_episode(
     net: neat.nn.FeedForwardNetwork, seed: int, config: GameConfig
 ) -> tuple[float, int]:
-    """Chạy 1 episode, trả về (fitness, frames_alive). Fitness = frames_alive + 100*score."""
+    """Runs one episode; fitness = frames_alive + 100 * score."""
     game = FlappyGame(config, seed=seed)
     state = game.state
     frames_alive = 0
@@ -70,7 +69,7 @@ def _make_eval_function(episodes_per_genome: int, game_config: GameConfig, resul
             net = neat.nn.FeedForwardNetwork.create(genome, neat_config)
             episode_fitnesses = []
             for i in range(episodes_per_genome):
-                # Seed đổi theo generation để genome không "học tủ" vài seed cố định.
+                # Seed varies by generation so genomes can't overfit to fixed seeds.
                 episode_seed = 2000 + gen * episodes_per_genome + i
                 fitness, frames = _run_episode(net, seed=episode_seed, config=game_config)
                 episode_fitnesses.append(fitness)

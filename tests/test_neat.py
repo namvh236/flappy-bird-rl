@@ -1,9 +1,6 @@
-"""Test smoke cho pipeline huấn luyện NEAT (docs/plan/checklist.md P5).
-
-Chỉ chạy population rất nhỏ (pop 8, 1 generation) — mục tiêu xác nhận pipeline
-(config → population → eval → save/load → predict) không lỗi, không phải đo
-hiệu năng agent.
-"""
+"""Smoke test for the NEAT training pipeline (checklist P5); runs a tiny
+population (pop 8, 1 generation) to confirm config -> population -> eval ->
+save/load -> predict works, not to measure agent performance."""
 
 from __future__ import annotations
 

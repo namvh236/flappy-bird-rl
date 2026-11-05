@@ -1,4 +1,4 @@
-"""Chiến lược reward cấu hình được cho `FlappyBirdEnv` (spec §5.5)."""
+"""Configurable reward strategies for `FlappyBirdEnv`."""
 
 from __future__ import annotations
 

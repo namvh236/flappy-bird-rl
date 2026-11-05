@@ -1,8 +1,4 @@
-"""Hằng số vật lý/kích thước của game, gom vào một chỗ (spec §5.1).
-
-Toàn bộ giá trị mặc định bằng đúng bản gốc `game/legacy.py`, để `FlappyGame`
-với `GameConfig()` mặc định tái tạo đúng "cảm giác" của bản gốc.
-"""
+"""Game constants; defaults must match `legacy.py` so `GameConfig()` reproduces its feel."""
 
 from __future__ import annotations
 
@@ -25,6 +21,6 @@ class GameConfig:
     pipe_gap: int = 150
     pipe_offset_range: tuple[int, int] = (-100, 100)
     scroll_speed: int = 4
-    pipe_interval_frames: int = 90  # = 1500 ms * 60 fps (bản gốc dùng get_ticks(), P3 fix)
-    ceiling_kills: bool = True  # rect.top < 0 => chết (như bản gốc)
-    float_physics: bool = False  # False = giữ int(vel) như bản gốc (P8)
+    pipe_interval_frames: int = 90  # legacy used get_ticks(); 1500ms * 60fps emulates it in frames
+    ceiling_kills: bool = True  # rect.top < 0 kills, matching legacy
+    float_physics: bool = False  # False keeps int(vel) like legacy

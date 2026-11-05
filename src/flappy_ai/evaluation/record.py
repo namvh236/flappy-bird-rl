@@ -1,5 +1,5 @@
-"""`record.py`: chơi một agent trên `FlappyBirdEnv(render_mode="rgb_array")` và
-xuất kết quả ra GIF/MP4 (spec §5.7). Dùng chung `build_agent` với `play.py`.
+"""`record.py`: plays an agent on `FlappyBirdEnv(render_mode="rgb_array")`
+and saves the result as GIF/MP4. Shares `build_agent` with `play.py`.
 """
 
 from __future__ import annotations
@@ -88,7 +88,7 @@ def record(
             for frame in frames:
                 writer.append_data(frame)
     else:
-        raise ValueError(f"đuôi file không hỗ trợ: {out.suffix!r}")
+        raise ValueError(f"unsupported file extension: {out.suffix!r}")
     return out
 
 
@@ -103,8 +103,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--fps", type=int, default=60)
     parser.add_argument("--overlay", action="store_true")
-    parser.add_argument("--scale", type=float, default=1.0, help="thu nhỏ khung hình, vd 0.5")
-    parser.add_argument("--pixel-obs", action="store_true", help="model train trên ảnh")
+    parser.add_argument("--scale", type=float, default=1.0, help="shrink frames, e.g. 0.5")
+    parser.add_argument("--pixel-obs", action="store_true", help="model trained on images")
     args = parser.parse_args(argv)
 
     out = record(

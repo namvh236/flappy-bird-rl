@@ -1,7 +1,5 @@
-"""`FrameSkip`: lặp lại action trong `skip` step lõi mỗi lần `step()` (spec
-§5.4, sequence diagram §3.3) — flap chỉ áp dụng ở frame đầu tiên, các frame
-bỏ qua nhận action `0` (không làm gì) vì giữ flap liên tục không có ý nghĩa
-vật lý (mỗi flap chỉ đặt lại `vel`, gọi lại không đổi gì thêm trong cùng loạt).
+"""`FrameSkip`: repeats the action for `skip` core steps; flap only applies on
+the first frame since repeating it has no extra physical effect.
 """
 
 from __future__ import annotations
@@ -17,7 +15,7 @@ class FrameSkip(gym.Wrapper):
     def __init__(self, env: gym.Env, skip: int = 4):
         super().__init__(env)
         if skip < 1:
-            raise ValueError("skip phải >= 1")
+            raise ValueError("skip must be >= 1")
         self.skip = skip
 
     def step(self, action):
@@ -36,9 +34,8 @@ class FrameSkip(gym.Wrapper):
 
 
 class PixelObs(gym.ObservationWrapper):
-    """Stack 4 frame grayscale 84×84 channel-first (spec `docs/plan/experiments.md`
-    stretch goal CNN DQN) — tương thích `CnnPolicy` của SB3, vốn kỳ vọng
-    `(C, H, W)` như Atari thay vì `(H, W, C)` của ảnh raw.
+    """Stacks 4 grayscale 84x84 frames, channel-first to match SB3's `CnnPolicy`
+    (like Atari).
     """
 
     FRAME_SIZE = 84
@@ -48,7 +45,7 @@ class PixelObs(gym.ObservationWrapper):
     def __init__(self, env: gym.Env):
         if env.render_mode != "rgb_array":
             raise ValueError(
-                f"PixelObs yêu cầu env.render_mode == 'rgb_array', nhận {env.render_mode!r}"
+                f"PixelObs requires env.render_mode == 'rgb_array', got {env.render_mode!r}"
             )
         super().__init__(env)
         self.observation_space = gym.spaces.Box(

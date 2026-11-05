@@ -1,6 +1,5 @@
-"""`NeatAgent`: load genome NEAT đã train (pickle) + file cấu hình `neat.cfg`,
-dựng `neat.nn.FeedForwardNetwork` để suy luận hành động flap (spec §5.6).
-"""
+"""`NeatAgent`: loads a trained NEAT genome (pickle) + `neat.cfg`, builds a
+`neat.nn.FeedForwardNetwork` to infer the flap action."""
 
 from __future__ import annotations
 

@@ -1,9 +1,5 @@
-"""`HeuristicAgent`: luật cứng — flap khi bird đang rơi và sắp chạm mép dưới
-khe pipe kế tiếp (spec §5.6), để kiểm chứng env "chơi được" mà không cần học.
-
-Ngưỡng tính trên feature #4 đã chuẩn hoá của `observation.py`
-(`(gap_bottom - bird.bottom) / screen_height`), không cần biết pixel thật.
-"""
+"""`HeuristicAgent`: flaps when falling and near the gap's lower edge, a
+hand-coded baseline to confirm the env is "beatable" without learning."""
 
 from __future__ import annotations
 

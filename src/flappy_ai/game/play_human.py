@@ -1,7 +1,4 @@
-"""Chơi tay trên `FlappyGame` + `PygameRenderer` (P1). Click chuột hoặc phím
-Space để flap (edge-triggered, mỗi lần nhấn = một cú flap). Sau khi chết,
-click vào nút restart để chơi lại. Đóng cửa sổ để thoát.
-"""
+"""Human play loop: click or Space to flap, click restart after death, close window to quit."""
 
 from __future__ import annotations
 
@@ -28,7 +25,7 @@ def run_human_play(fps: int = 60, seed: int | None = None) -> None:
                 flap = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 flap = True
-                restart_click = True  # cùng một click: flap khi sống, restart khi đã chết
+                restart_click = True  # same click flaps while alive, restarts after death
 
         if not running:
             break

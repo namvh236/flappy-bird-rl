@@ -1,5 +1,5 @@
-# Ablation P4: biased exploration + reward `shaped` (spec §5.5) — tín hiệu
-# thưởng dày hơn (khoảng cách tới tâm khe) để DQN học nhanh hơn "đi vào khe".
+# Ablation: biased exploration + shaped reward — denser signal (distance to
+# gap center) so DQN learns to enter the gap faster.
 total_timesteps: 300000
 eval_freq: 10000
 n_envs: 1

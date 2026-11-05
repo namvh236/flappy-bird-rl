@@ -1,4 +1,4 @@
-"""Test cho `FlappyBirdEnv` (docs/plan/checklist.md P2)."""
+"""Tests for `FlappyBirdEnv` (checklist P2)."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import gymnasium as gym
 import numpy as np
 from gymnasium.utils.env_checker import check_env
 
-import flappy_ai.env  # noqa: F401 (đăng ký "FlappyBird-v0")
+import flappy_ai.env  # noqa: F401 (registers "FlappyBird-v0")
 from flappy_ai.env.flappy_env import FlappyBirdEnv
 from flappy_ai.env.wrappers import FrameSkip
 

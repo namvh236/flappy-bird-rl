@@ -1,14 +1,5 @@
-"""`FlappyGame`: logic thuần, không phụ thuộc `pygame.display` (spec §5.2).
-
-Thứ tự xử lý trong một `step()` (giữ đúng spec, xem ghi chú §3.1 về khác biệt
-có chủ đích so với vòng lặp frame của bản gốc — §7 liệt kê rõ):
-
-1. Flap (nếu còn sống) → đặt vận tốc.
-2. Trọng lực + di chuyển bird.
-3. Sinh pipe mới nếu đã đủ `pipe_interval_frames`.
-4. Cuộn pipe sang trái, xoá pipe ra khỏi màn hình.
-5. Tính điểm: pipe đã qua hẳn bird và chưa tính ⇒ +1, đánh dấu `passed`.
-6. Kiểm tra va chạm: pipe → ceiling → ground (đúng thứ tự ưu tiên trong spec).
+"""`FlappyGame`: pure logic, no `pygame.display`; `step()` order (flap, gravity,
+spawn, scroll, score, collide) mirrors legacy exactly.
 """
 
 from __future__ import annotations
@@ -58,7 +49,7 @@ class FlappyGame:
         self.reset(seed)
 
     def reset(self, seed: int | None = None) -> GameState:
-        """Khởi tạo lại TOÀN BỘ state (sửa P6: bản gốc quên reset vel/pass_pipe/...)."""
+        """Reset all state (legacy forgot to reset vel/passed on restart)."""
         if seed is not None:
             self._rng = random.Random(seed)
         self.frame = 0
@@ -68,8 +59,7 @@ class FlappyGame:
         self.ground_scroll = 0
         self.dead = False
         self.death_cause: DeathCause | None = None
-        # Bản gốc backdate `last_pipe` để pipe đầu tiên sinh ngay frame đang bay
-        # đầu tiên; ở đây tương đương: coi như đã "đến hạn" tại frame 0.
+        # Backdated like legacy so the first pipe spawns immediately on frame 0.
         self._last_spawn_frame = -self.config.pipe_interval_frames
         return self.state
 

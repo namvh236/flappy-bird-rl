@@ -1,9 +1,9 @@
-"""Xem một agent chơi trên `FlappyBirdEnv` với render `human` (spec §5.7
-`play.py`). Agent con người (`--agent human`) vẫn dùng `game/play_human.py`
-(P1) — nó điều khiển trực tiếp qua chuột/phím, không qua interface `Agent`.
+"""Watches an agent play on `FlappyBirdEnv` with `human` rendering. The human
+agent (`--agent human`) still uses `game/play_human.py`, controlling directly
+via mouse/keyboard instead of the `Agent` interface.
 
-Phím khi xem: `+`/`-` tăng/giảm tốc độ, `P` tạm dừng, `R` chơi lại episode
-mới, `Esc`/đóng cửa sổ để thoát.
+Keys while watching: `+`/`-` speed up/down, `P` pause, `R` restart the
+episode, `Esc`/close window to quit.
 """
 
 from __future__ import annotations
