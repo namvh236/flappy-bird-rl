@@ -8,6 +8,8 @@ n_envs: 8
 # ~56 step/s; SubprocVecEnv tách render ra nhiều process (~7× nhanh hơn).
 vec_env: subproc
 vec_env_start_method: forkserver
+# Env step; ghi đè models/<run>/checkpoint.zip + replay buffer để `--resume` sau crash.
+checkpoint_freq: 100000
 
 hyperparameters:
   learning_rate: 0.0001
@@ -20,3 +22,8 @@ hyperparameters:
   exploration_fraction: 0.1
   exploration_final_eps: 0.01
   gamma: 0.99
+  # Chỉ lưu obs (next_obs = ô kế tiếp): buffer 5,26 → 2,63 GiB; run trước bị OOM-kill ở
+  # ~650k step. SB3 bắt buộc tắt handle_timeout_termination khi bật tuỳ chọn này.
+  optimize_memory_usage: true
+  replay_buffer_kwargs:
+    handle_timeout_termination: false

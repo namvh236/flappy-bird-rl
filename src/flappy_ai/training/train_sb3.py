@@ -22,7 +22,12 @@ import flappy_ai.env  # noqa: F401 (đăng ký "FlappyBird-v0")
 
 from ..env.wrappers import FrameSkip, PixelObs
 from ..game.config import GameConfig
-from .callbacks import ScoreLoggingCallback, build_eval_callback
+from .callbacks import (
+    LatestCheckpointCallback,
+    ScoreLoggingCallback,
+    build_eval_callback,
+    replay_buffer_path,
+)
 
 ALGOS = {"dqn": DQN, "ppo": PPO}
 DEFAULT_CONFIGS = {"dqn": Path("configs/dqn.yaml"), "ppo": Path("configs/ppo.yaml")}
@@ -88,6 +93,7 @@ def train(
     total_timesteps: int | None,
     n_envs: int | None,
     device: str,
+    resume: Path | None = None,
 ) -> Path:
     algo_cls = ALGOS[algo]
     config = _load_config(config_path)
@@ -129,7 +135,7 @@ def train(
     model_dir.mkdir(parents=True, exist_ok=True)
 
     with (run_dir / "config.yaml").open("w") as f:
-        yaml.safe_dump(config, f)
+        yaml.safe_dump({**config, "resumed_from": str(resume)} if resume else config, f)
     (run_dir / "git_commit.txt").write_text(_git_commit_hash() + "\n")
 
     env = make_vec_env(
@@ -153,21 +159,43 @@ def train(
     model_kwargs = dict(hyperparams)
     if algo_cls is BiasedExplorationDQN:
         model_kwargs["flap_bias"] = flap_bias
-    model = algo_cls(
-        policy,
-        env,
-        seed=seed,
-        device=device,
-        tensorboard_log=str(run_dir),
-        **model_kwargs,
-    )
+    if resume:
+        # kwargs ghi đè hyperparams đã lưu trước `_setup_model()`, nên thay đổi config
+        # (vd. `optimize_memory_usage`) áp dụng được lên model cũ.
+        model = algo_cls.load(
+            resume, env=env, device=device, tensorboard_log=str(run_dir), **model_kwargs
+        )
+        buffer_path = replay_buffer_path(resume)
+        if hasattr(model, "replay_buffer"):
+            if buffer_path.exists():
+                model.load_replay_buffer(buffer_path)
+            else:
+                # Buffer rỗng: thu thập lại `learning_starts` step trước khi train,
+                # không thì gradient đầu tiên chỉ lấy mẫu từ vài transition.
+                model.learning_starts += model.num_timesteps
+    else:
+        model = algo_cls(
+            policy,
+            env,
+            seed=seed,
+            device=device,
+            tensorboard_log=str(run_dir),
+            **model_kwargs,
+        )
 
     callbacks = [
         ScoreLoggingCallback(),
         build_eval_callback(eval_env, model_dir, eval_freq=config.get("eval_freq", 25_000)),
     ]
+    if "checkpoint_freq" in config:
+        callbacks.append(LatestCheckpointCallback(model_dir, config["checkpoint_freq"]))
 
-    model.learn(total_timesteps=timesteps, tb_log_name="tb", callback=callbacks)
+    model.learn(
+        total_timesteps=timesteps - model.num_timesteps,
+        tb_log_name="tb",
+        callback=callbacks,
+        reset_num_timesteps=not resume,
+    )
     model.save(model_dir / "final_model.zip")
     env.close()
     eval_env.close()
@@ -182,11 +210,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--total-timesteps", type=int, default=None)
     parser.add_argument("--n-envs", type=int, default=None)
     parser.add_argument("--device", default="auto")
+    parser.add_argument("--resume", type=Path, default=None, help="model .zip để train tiếp")
     args = parser.parse_args(argv)
 
     config_path = args.config or DEFAULT_CONFIGS[args.algo]
     model_dir = train(
-        args.algo, config_path, args.seed, args.total_timesteps, args.n_envs, args.device
+        args.algo,
+        config_path,
+        args.seed,
+        args.total_timesteps,
+        args.n_envs,
+        args.device,
+        args.resume,
     )
     print(f"Saved model to {model_dir}")
     return 0

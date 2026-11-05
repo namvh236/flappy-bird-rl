@@ -52,6 +52,7 @@ def main(argv: list[str] | None = None) -> int:
     train_cmd.add_argument("--pop-size", type=int, default=None, help="chỉ dùng cho NEAT")
     train_cmd.add_argument("--n-envs", type=int, default=None)
     train_cmd.add_argument("--device", default="auto")
+    train_cmd.add_argument("--resume", type=str, default=None, help="SB3: model .zip để train tiếp")
 
     record_cmd = sub.add_parser("record", help="Ghi GIF/MP4 một agent chơi")
     record_cmd.add_argument("--agent", choices=AGENTS, default="heuristic")
@@ -124,6 +125,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "train":
         if args.algo == "neat":
+            if args.resume:
+                parser.error("--resume chỉ hỗ trợ SB3 (dqn/ppo)")
             from flappy_ai.training.train_neat import DEFAULT_NEAT_CONFIG, train_neat
 
             config_path = Path(args.config) if args.config else DEFAULT_NEAT_CONFIG
@@ -141,7 +144,13 @@ def main(argv: list[str] | None = None) -> int:
 
         config_path = Path(args.config) if args.config else DEFAULT_CONFIGS[args.algo]
         model_dir = train(
-            args.algo, config_path, args.seed, args.total_timesteps, args.n_envs, args.device
+            args.algo,
+            config_path,
+            args.seed,
+            args.total_timesteps,
+            args.n_envs,
+            args.device,
+            Path(args.resume) if args.resume else None,
         )
         print(f"Saved model to {model_dir}")
         return 0

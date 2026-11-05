@@ -38,7 +38,7 @@ Cần Python 3.12 (torch/pygame chưa có wheel ổn định cho 3.13+ trên má
 git clone https://github.com/devk1ngz/flappy-bird.git
 cd flappy-bird
 uv sync                # tạo .venv + cài đúng version đã khoá trong uv.lock
-uv run pytest -q       # 36 test
+uv run pytest -q       # 37 test
 uv run ruff check .    # lint
 ```
 
@@ -136,36 +136,25 @@ docs/            # spec/architecture.md, plan/{plan,checklist,experiments}.md, m
 ## 🧪 Test & chất lượng
 
 ```sh
-uv run pytest -q        # 36 test: physics, collision, scoring, parity, env, agents, neat, pixels, record, population
+uv run pytest -q        # 37 test: physics, collision, scoring, parity, env, agents, training/resume, neat, pixels, record, population
 uv run ruff check .     # lint
 uv run ruff format .    # format
 ```
 
 `tests/test_parity.py` replay cùng chuỗi action trên `game/legacy.py` và `FlappyGame`, so quỹ đạo `bird.y` trong 300 frame đầu để đảm bảo refactor không đổi cảm giác chơi.
 
-## 📦 Model & phát hành
+## 📦 Model
 
-Model tốt nhất (PPO, mean 220) nằm trong `models/ppo_20260927-003700/` (thư mục `models/` bị `.gitignore` — cần upload kèm GitHub Release nếu muốn người khác chạy demo ngay). Lệnh phát hành:
+Thư mục `models/` bị `.gitignore`. Muốn có model chạy demo ngay, train lại PPO (~40 phút trên CPU):
 
 ```sh
-gh release create v1.0.0 --title "v1.0.0" --notes-file docs/plan/experiments.md \
-  models/ppo_20260927-003700/best_model.zip
+SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy .venv/bin/flappy-ai train --algo ppo --config configs/ppo.yaml --seed 1
 ```
 
-## 📌 Việc còn lại (chưa hoàn thành ở v1.0)
+## 📌 Việc còn lại
 
-1. **Train DQN pixel đủ 2M step** (P7, stretch goal — đã có sẵn code/config/test):
-   ```sh
-   SDL_VIDEODRIVER=dummy .venv/bin/flappy-ai train --algo dqn --config configs/dqn_pixels.yaml --seed 0 --device cuda
-   ```
-   Ước tính **~4,7 giờ** ở cấu hình hiện tại (đo được **118 step/s** với `n_envs=8` + `vec_env: subproc`; nút cổ chai là render pygame 864×936, không phải GPU). Muốn nhanh hơn: render ở độ phân giải thấp (pre-scale asset) trước khi resize về 84×84.
-   Lần chạy dở dang đạt ~100k step: eval 20 episode = **0 điểm** (còn ở pha exploration), đã dừng theo yêu cầu — xem [`docs/plan/experiments.md`](docs/plan/experiments.md).
-2. **Upload model lên GitHub Release** (cần `gh` CLI + quyền repo):
-   ```sh
-   gh release create v1.0.0 --notes-file docs/plan/experiments.md \
-     models/ppo_20260927-003700/best_model.zip
-   ```
-3. **Xếp hạng agent thật sự**: heuristic, PPO và NEAT đều chạm trần 220 pipe/episode nên bằng điểm nhau — muốn tách biệt cần nâng `max_episode_steps` hoặc giảm `pipe_gap`.
+- **Xếp hạng agent thật sự**: heuristic, PPO và NEAT đều chạm trần 220 pipe/episode nên bằng điểm nhau — muốn tách biệt cần nâng `max_episode_steps` hoặc giảm `pipe_gap`.
+- **DQN pixel** (2M step, mean 0) và các ablation DQN không đạt G4; hướng thử tiếp (double DQN, n-step, pre-scale render) ghi trong [`docs/plan/experiments.md`](docs/plan/experiments.md).
 
 ## 📢 Liên hệ
 

@@ -8,6 +8,8 @@ năng agent (việc đó thuộc benchmark G4, chạy riêng bằng `flappy-ai t
 from __future__ import annotations
 
 import os
+import pickle
+import shutil
 
 import numpy as np
 import pytest
@@ -50,6 +52,30 @@ def test_train_dqn_produces_loadable_model(tmp_path, dqn_config, monkeypatch):
     assert action in (0, 1)
     assert "q_values" in agent.explain()
     assert len(agent.explain()["q_values"]) == 2
+
+
+def test_resume_continues_timesteps_and_replay_buffer(tmp_path, dqn_config, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    dqn_config.write_text(dqn_config.read_text() + "checkpoint_freq: 100\n")
+    first_dir = train("dqn", dqn_config, seed=0, total_timesteps=200, n_envs=None, device="cpu")
+    ckpt_dir = tmp_path / "ckpt"
+    shutil.copytree(first_dir, ckpt_dir)
+
+    resumed_dir = train(
+        "dqn",
+        dqn_config,
+        seed=0,
+        total_timesteps=300,
+        n_envs=None,
+        device="cpu",
+        resume=ckpt_dir / "checkpoint.zip",
+    )
+
+    model = SB3Agent("dqn", resumed_dir / "final_model.zip").model
+    assert model.num_timesteps == 300
+    with (resumed_dir / "checkpoint_replay_buffer.pkl").open("rb") as f:
+        # Run resume tự nó chỉ thêm ≤100 transition; nhiều hơn ⇒ buffer cũ đã được nạp.
+        assert pickle.load(f).pos > 100
 
 
 def test_sb3_agent_rejects_unknown_algo(tmp_path):
