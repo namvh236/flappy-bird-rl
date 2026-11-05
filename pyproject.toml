@@ -1,7 +1,7 @@
 [project]
 name = "flappy-bird-ai"
 version = "0.1.0"
-description = "Flappy Bird AI Agent — deps theo docs/spec/architecture.md §6 (Gymnasium env + DQN/PPO qua stable-baselines3, NEAT tuỳ chọn)"
+description = "Flappy Bird AI Agent: Gymnasium env with DQN/PPO (stable-baselines3) and NEAT"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [

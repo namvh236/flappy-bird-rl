@@ -6,13 +6,6 @@ Bản clone **Flappy Bird** (Python + pygame-ce) đã được refactor thành m
 - Env `FlappyBird-v0` (Gymnasium), observation 8 chiều hoặc ảnh 84×84×4.
 - Agent: `random`, `heuristic`, `dqn`, `ppo` (stable-baselines3), `neat` (neat-python).
 - **PPO giải hoàn toàn game**: mean/median **220/220** trên 100 episode (chạm trần `max_episode_steps = 20.000` frame).
-- Chi tiết thiết kế: [`docs/spec/architecture.md`](docs/spec/architecture.md) · nhật ký thí nghiệm: [`docs/plan/experiments.md`](docs/plan/experiments.md).
-
-## 🎬 Demo
-
-PPO tự chơi (GIF chỉ hiển thị HUD debug: đường cảm biến tới khe pipe, action, xác suất flap, episode, best score):
-
-![PPO agent chơi Flappy Bird](docs/media/ppo_demo.gif)
 
 ## 📊 Kết quả benchmark
 
@@ -22,10 +15,10 @@ Mỗi agent chạy 100 episode, dải seed cố định `1000–1099` (không tr
 |-------|------|--------|-----|-----|----------|
 | Random | 0.00 | 0 | 0 | 0.00 | Chết ở trần ngay |
 | Heuristic | 220.00 | 220 | 220 | 0.00 | **Chạm trần** mọi episode |
-| DQN (features, 1M step) | 0.05 | 0 | 5 | 0.50 | Không học được (4 ablation, xem experiments.md) |
+| DQN (features, 1M step) | 0.05 | 0 | 5 | 0.50 | Không học được dù đã thử 4 ablation |
 | PPO (features, 1M step, `n_envs=8`) | 220.00 | 220 | 220 | 0.00 | **Giải hoàn toàn game** |
 | NEAT (120 generation, 8 ep/genome) | 220.00 | 220 | 220 | 0.00 | Đạt trần từ generation 25 |
-| DQN (pixel, CnnPolicy) | 0.00 (20 ep) | 0 | 0 | 0.00 | Mới train ~100k/2M step rồi dừng — xem [`experiments.md`](docs/plan/experiments.md) |
+| DQN (pixel, CnnPolicy, 2M step) | 0.00 (100 ep) | 0 | 0 | 0.00 | Né được trần/đất nhưng chết ở pipe đầu tiên |
 | Headless throughput | **47.000 step/s** (`scripts/benchmark_headless.py`) | | | | G1 (≥ 5.000 step/s) đạt |
 
 Lưu ý về trần điểm: vì heuristic đã chạm trần 220 ở mọi episode, "vượt heuristic" là bất khả thi trong cấu hình mặc định — các agent được so bằng tỉ lệ chết theo pipe và độ ổn định (std) thay vì mean.
@@ -78,7 +71,7 @@ Phím khi xem: `+` / `-` tăng/giảm tốc độ, `P` tạm dừng, `R` chơi l
 # PPO — cấu hình tốt nhất (n_envs=8), ~40 phút cho 800k step trên CPU/GPU laptop
 .venv/bin/flappy-ai train --algo ppo --config configs/ppo.yaml --seed 0
 
-# DQN baseline (feature vector) — KHÔNG hội tụ, xem experiments.md để biết các ablation đã thử
+# DQN baseline (feature vector) — KHÔNG hội tụ dù đã thử 4 ablation (biased exploration, frame_skip, shaped, curriculum)
 .venv/bin/flappy-ai train --algo dqn --config configs/dqn.yaml --seed 0
 
 # DQN pixel (CnnPolicy, 84×84×4) — cần GPU, chậm (xem ghi chú bên dưới)
@@ -103,7 +96,7 @@ In ra `mean / median / max / std` + phân bố `death_cause`, đồng thời ghi
 
 ```sh
 .venv/bin/flappy-ai record --agent ppo --model models/ppo_20260927-003700/best_model.zip \
-  --out docs/media/ppo_demo.gif --frames 150 --fps 30 --overlay --scale 0.4
+  --out demo.gif --frames 150 --fps 30 --overlay --scale 0.4
 ```
 
 `--overlay` bật HUD, `--scale` thu nhỏ khung hình (GIF 864×936 rất nặng), đuôi `.mp4` xuất video.
@@ -122,7 +115,6 @@ src/flappy_ai/
 configs/         # dqn, ppo, dqn_pixels, neat.cfg + các ablation DQN
 scripts/         # benchmark_headless.py
 tests/           # core, env, parity, agents, evaluate, training, neat, pixels, record, population
-docs/            # spec/architecture.md, plan/{plan,checklist,experiments}.md, media/
 ```
 
 ## ⚠️ Khác biệt có chủ đích so với bản gốc
@@ -154,7 +146,7 @@ SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy .venv/bin/flappy-ai train --algo ppo
 ## 📌 Việc còn lại
 
 - **Xếp hạng agent thật sự**: heuristic, PPO và NEAT đều chạm trần 220 pipe/episode nên bằng điểm nhau — muốn tách biệt cần nâng `max_episode_steps` hoặc giảm `pipe_gap`.
-- **DQN pixel** (2M step, mean 0) và các ablation DQN không đạt G4; hướng thử tiếp (double DQN, n-step, pre-scale render) ghi trong [`docs/plan/experiments.md`](docs/plan/experiments.md).
+- **DQN pixel** (2M step, mean 0) và các ablation DQN không đạt G4; hướng thử tiếp: double DQN, n-step, pre-scale render.
 
 ## 📢 Liên hệ
 

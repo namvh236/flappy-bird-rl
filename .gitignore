@@ -238,3 +238,4 @@ runs/
 # NEAT checkpoints (Phase P5, if implemented)
 neat-checkpoint-*
 AGENTS.md
+docs/
