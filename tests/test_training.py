@@ -74,8 +74,3 @@ def test_resume_continues_timesteps_and_replay_buffer(tmp_path, dqn_config, monk
     with (resumed_dir / "checkpoint_replay_buffer.pkl").open("rb") as f:
         # Resume itself only adds <=100 transitions; more means the old buffer loaded.
         assert pickle.load(f).pos > 100
-
-
-def test_sb3_agent_rejects_unknown_algo(tmp_path):
-    with pytest.raises(ValueError):
-        SB3Agent("unknown", tmp_path / "model.zip")

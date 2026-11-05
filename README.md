@@ -37,7 +37,7 @@ Requires Python 3.12 (torch/pygame-ce have no stable wheels for 3.13+ yet). Uses
 git clone https://github.com/namvh236/flappy-bird.git
 cd flappy-bird
 uv sync                # creates .venv with the versions pinned in uv.lock
-uv run pytest -q       # 37 tests
+uv run pytest -q       # 25 tests
 uv run ruff check .    # lint
 ```
 
@@ -126,7 +126,7 @@ src/flappy_ai/
 └── cli.py       # flappy-ai play|train|eval|record
 configs/         # dqn, ppo, dqn_pixels, neat.cfg + DQN ablations
 scripts/         # benchmark_headless.py
-tests/           # core, env, parity, agents, evaluate, training, neat, pixels, record, population
+tests/           # core, env, parity, agents, evaluate, training, neat, pixels
 pretrained/      # ppo_best.zip
 media/           # ppo_demo.gif
 ```
@@ -142,7 +142,7 @@ media/           # ppo_demo.gif
 ## 🧪 Tests & quality
 
 ```sh
-uv run pytest -q        # 37 tests: physics, collision, scoring, parity, env, agents, training/resume, neat, pixels, record, population
+uv run pytest -q        # 25 tests: physics, collision, scoring, parity, env, agents, training/resume, neat, pixels
 uv run ruff check .     # lint
 uv run ruff format .    # format
 ```

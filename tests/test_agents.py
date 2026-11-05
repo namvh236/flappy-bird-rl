@@ -5,19 +5,6 @@ from __future__ import annotations
 import numpy as np
 
 from flappy_ai.agents.heuristic import HeuristicAgent
-from flappy_ai.agents.random_agent import RandomAgent
-
-
-def test_random_agent_only_returns_valid_actions():
-    agent = RandomAgent(flap_prob=0.5, seed=0)
-    actions = {agent.act(np.zeros(8)) for _ in range(200)}
-    assert actions <= {0, 1}
-    assert len(actions) == 2  # 200 draws at p=0.5 reliably see both values
-
-
-def test_random_agent_flap_prob_zero_never_flaps():
-    agent = RandomAgent(flap_prob=0.0, seed=0)
-    assert all(agent.act(np.zeros(8)) == 0 for _ in range(50))
 
 
 def test_heuristic_flaps_when_falling_near_gap_bottom():

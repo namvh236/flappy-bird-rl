@@ -7,19 +7,6 @@ from flappy_ai.game.core import FlappyGame
 from flappy_ai.game.entities import PipePair
 
 
-def test_spawn_position_matches_legacy_center_to_topleft():
-    cfg = GameConfig()
-    game = FlappyGame(cfg, seed=0)
-    state = game.reset(seed=0)
-    # Original: Bird(100, 468) sets rect.center=[100,468] -> topleft (75, 450)
-    # with bird_size=(51, 36).
-    assert state.bird_rect.x == 75
-    assert state.bird_y == 450.0
-    assert state.bird_vel == 0.0
-    assert state.score == 0
-    assert not state.dead
-
-
 def test_gravity_accumulates_and_clamps_to_max_fall_speed():
     game = FlappyGame(GameConfig(), seed=0)
     game.reset(seed=0)

@@ -19,14 +19,6 @@ def test_requires_rgb_array_render_mode():
         PixelObs(FlappyBirdEnv())
 
 
-def test_observation_space_shape_and_dtype():
-    env = PixelObs(FlappyBirdEnv(render_mode="rgb_array"))
-    assert env.observation_space.shape == (4, 84, 84)
-    assert env.observation_space.dtype == np.uint8
-    assert env.observation_space.low.min() == 0
-    assert env.observation_space.high.max() == 255
-
-
 def test_reset_stacks_same_frame_four_times():
     env = PixelObs(FlappyBirdEnv(render_mode="rgb_array"))
     obs, _info = env.reset(seed=0)

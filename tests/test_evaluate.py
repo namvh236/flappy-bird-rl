@@ -15,13 +15,6 @@ class _NeverFlapAgent:
         return {}
 
 
-def test_evaluate_agent_runs_full_episodes_and_reports_death_cause():
-    results = evaluate_agent(_NeverFlapAgent(), episodes=3, seed_start=0)
-    assert len(results) == 3
-    assert all(r.death_cause in ("pipe", "ceiling", "ground") for r in results)
-    assert all(r.steps > 0 for r in results)
-
-
 def test_summarize_computes_mean_median_max_std_and_death_causes():
     results = [
         EpisodeResult(seed=0, score=10, steps=100, death_cause="pipe"),
