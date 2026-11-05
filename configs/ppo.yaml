@@ -1,0 +1,14 @@
+# Hyperparameter khởi điểm PPO (spec §5.6), `n_envs = 8` để so sánh với DQN.
+total_timesteps: 300000
+eval_freq: 10000
+n_envs: 8
+
+hyperparameters:
+  learning_rate: 0.0003
+  n_steps: 2048
+  batch_size: 64
+  gamma: 0.99
+  gae_lambda: 0.95
+  ent_coef: 0.0
+  policy_kwargs:
+    net_arch: [64, 64]

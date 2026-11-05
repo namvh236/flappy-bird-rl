@@ -1,0 +1,52 @@
+[project]
+name = "flappy-bird-ai"
+version = "0.1.0"
+description = "Flappy Bird AI Agent — deps theo docs/spec/architecture.md §6 (Gymnasium env + DQN/PPO qua stable-baselines3, NEAT tuỳ chọn)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    # Game
+    "pygame-ce>=2.5,<3",
+    # Env chuẩn
+    "gymnasium>=1.0,<2",
+    # RL (CPU đủ với feature vector, xem architecture.md:357)
+    "stable-baselines3>=2.3,<3",
+    "torch>=2.4,<3",
+    # Neuroevolution (tuỳ chọn, architecture.md:358)
+    "neat-python>=0.92,<1",
+    # Config
+    "pyyaml>=6.0,<7",
+    # Log
+    "tensorboard>=2.17,<3",
+    # Media (ghi GIF/MP4, architecture.md:363)
+    "imageio[ffmpeg]>=2.34,<3",
+]
+
+[project.scripts]
+flappy-ai = "flappy_ai.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0,<9",
+    "ruff>=0.6,<1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/flappy_ai"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# legacy.py là bản sao y hệt game gốc (chỉ vá đường dẫn asset) để làm test
+# parity — PHẢI giữ nguyên style/logic gốc, không áp convention mới vào đây.
+extend-exclude = ["src/flappy_ai/game/legacy.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]

@@ -1,0 +1,22 @@
+# Stretch goal: CNN DQN trên pixel observation 84×84×4 (spec §5.7, §9).
+policy: CnnPolicy
+pixel_obs: true
+total_timesteps: 2000000
+eval_freq: 6250
+n_envs: 8
+# Render pixel bị nghẽn CPU: DummyVecEnv (mặc định SB3) chạy 8 env tuần tự
+# ~56 step/s; SubprocVecEnv tách render ra nhiều process (~7× nhanh hơn).
+vec_env: subproc
+vec_env_start_method: forkserver
+
+hyperparameters:
+  learning_rate: 0.0001
+  buffer_size: 100000
+  learning_starts: 10000
+  batch_size: 32
+  train_freq: 4
+  gradient_steps: 1
+  target_update_interval: 1000
+  exploration_fraction: 0.1
+  exploration_final_eps: 0.01
+  gamma: 0.99

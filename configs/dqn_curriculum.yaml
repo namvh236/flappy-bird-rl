@@ -1,0 +1,20 @@
+# Ablation P4: biased exploration + curriculum (`pipe_gap` rộng hơn bản gốc,
+# 220 thay vì 150, spec §9) để dễ sống sót qua pha đầu học.
+total_timesteps: 300000
+eval_freq: 10000
+n_envs: 1
+flap_bias: 0.1
+game_config:
+  pipe_gap: 220
+
+hyperparameters:
+  learning_rate: 0.0001
+  buffer_size: 100000
+  batch_size: 64
+  gamma: 0.99
+  exploration_fraction: 0.1
+  exploration_final_eps: 0.01
+  train_freq: 4
+  target_update_interval: 1000
+  policy_kwargs:
+    net_arch: [64, 64]

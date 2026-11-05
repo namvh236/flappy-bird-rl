@@ -1,0 +1,18 @@
+# Hyperparameter khởi điểm DQN (spec §5.6). `total_timesteps` ở đây là mặc
+# định thực dụng cho máy dev hiện tại; spec đề xuất 1-3M cho kết quả cuối,
+# override bằng `--total-timesteps` khi chạy full training.
+total_timesteps: 300000
+eval_freq: 10000
+n_envs: 1
+
+hyperparameters:
+  learning_rate: 0.0001
+  buffer_size: 100000
+  batch_size: 64
+  gamma: 0.99
+  exploration_fraction: 0.1
+  exploration_final_eps: 0.01
+  train_freq: 4
+  target_update_interval: 1000
+  policy_kwargs:
+    net_arch: [64, 64]
